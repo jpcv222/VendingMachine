@@ -8,8 +8,10 @@
  *
  * @author juanc
  */
+import static java.lang.String.valueOf;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 public class Maquina {
@@ -18,91 +20,180 @@ public class Maquina {
     Dinero[] arregloDineroCaja;
     ArrayList<Dinero> arregloDineroCambio;
     Producto[][] matrizMaquina;
-    
-     //Recorre el arreglo dinámico de ventas y trae un objto producto que coincida con el parámetro
+
+    //Valida fecha ingresada
+    //Retorna true si es válida la fecha
+    public boolean validarFecha(String horaInicial, String horaFinal) {
+
+        int _minIn, _minFin, _horaIn, _horaFin;
+        //horaIn representa a los dos primeros digitos en la hora inicial (HORA)
+        //horaFin representa a los dos primeros digitos en la hora final     (HORA)
+        //minIn representa a los dos últimos digitos en la hora inical (MINUTOS)
+        //minFin representa a los dos +ultimos digitos en la hora final    (MINUTOS)
+        String horaIn = horaInicial.split(":")[0];
+        String horaFin = horaFinal.split(":")[0];
+        String minIn = horaInicial.split(":")[1];
+        String minFin = horaFinal.split(":")[1];
+
+        try {
+
+            _minIn = Integer.parseInt(minIn);
+            _minFin = Integer.parseInt(minFin);
+            _horaIn = Integer.parseInt(horaIn);
+            _horaFin = Integer.parseInt(horaFin);
+
+            return (_minIn >= _minFin && _horaIn >= _horaFin);
+
+        } catch (NumberFormatException exp) {
+
+            return false;
+        }
+
+    }
+
+    //Recorre el arreglo dinámico de ventas y trae un objeto producto que coincida con el parámetro
     //Además, trae la cantidad de veces que el objeto ha sido vendido, modificando el atributo cantidad
-    public Producto getProductoVendido(String nombre){
-        
-    Producto producto = new Producto(), auxiliar;
-    int cantidadVendido = 0;
-    for(int i = 0; i < arregloVenta.size(); i++){
-        auxiliar = arregloVenta.get(i).getProductoVenta();
-    if(auxiliar.getNombre().equals(nombre)){
-        producto = auxiliar;
-        cantidadVendido++;
-    }
-    }
-    
-    producto.cantidad = cantidadVendido;
-    
-    return producto;
-    }
-    
-    
-    //Calcula la cantidad de dinero por cada producto
-    public String dineroPorProducto(){
-        
-    String respuesta = "";
-    Producto obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9, obj10;
-    try{
-    obj1 = getProductoVendido("Pony Malta");
-    obj2 = getProductoVendido("CocaCola");
-    obj3 = getProductoVendido("Milo");
-    obj4 = getProductoVendido("Jugo del valle");
-    obj5 = getProductoVendido("Agua");
-    obj6 = getProductoVendido("Café");
-    obj7 = getProductoVendido("Hit");
-    obj8 = getProductoVendido("Colombiana");
-    obj9 = getProductoVendido("Poker");
-    obj10 = getProductoVendido("Sprite");
-    
-    if(obj1.getCantidad() == 0 && obj2.getCantidad() == 0 && obj3.getCantidad() == 0
-            && obj4.getCantidad() == 0 && obj5.getCantidad() == 0 && obj6.getCantidad() == 0
-            && obj7.getCantidad() == 0 && obj8.getCantidad() == 0 && obj9.getCantidad() == 0
-            && obj10.getCantidad() == 0){
-        respuesta = "NO HAY PRODUCTOS VENDIDOS. \n";
-    
-    }else{
-    respuesta += (obj1.getCantidad()!=0)? obj1.getNombre()+ ": "+obj1.getCantidad()*obj1.getPrecio()+"\n":"";
-    respuesta += (obj2.getCantidad()!=0)? obj2.getNombre()+ ": "+obj2.getCantidad()*obj2.getPrecio()+"\n":"";
-    respuesta += (obj3.getCantidad()!=0)?obj3.getNombre()+ ": "+obj3.getCantidad()*obj3.getPrecio()+"\n":"";
-    respuesta += (obj4.getCantidad()!=0)?obj4.getNombre()+ ": "+obj4.getCantidad()*obj4.getPrecio()+"\n":"";
-    respuesta += (obj5.getCantidad()!=0)? obj5.getNombre()+ ": "+obj5.getCantidad()*obj5.getPrecio()+"\n":"";
-    respuesta += (obj6.getCantidad()!=0)? obj6.getNombre()+ ": "+obj6.getCantidad()*obj6.getPrecio()+"\n":"";
-    respuesta += (obj7.getCantidad()!=0)? obj7.getNombre()+ ": "+obj7.getCantidad()*obj7.getPrecio()+"\n":"";
-    respuesta += (obj8.getCantidad()!=0)?obj8.getNombre()+ ": "+obj8.getCantidad()*obj8.getPrecio()+"\n":"";
-    respuesta += (obj9.getCantidad()!=0)? obj9.getNombre()+ ": "+obj9.getCantidad()*obj9.getPrecio()+"\n":"";
-    respuesta += (obj10.getCantidad()!=0)? obj10.getNombre()+ ": "+obj10.getCantidad()*obj10.getPrecio()+"\n":"";
-    }
-    
-    }catch(NullPointerException EXP){
-        System.out.println("Producto no vendido.");
-    }
-    
-    return respuesta;
-    }
-    
-   
-    //Setea a 10 la cantidad del producto que hay en una casilla de la matriz, siempre y cuando se halla acabado.
-    public String reabastecerTodo(){
-        String respuesta= "";
-        for (int i = 0; i < 10; i++){
-            for (int j = 0; j < 4; j++   ){
-            if(!validarStockCasilla(i,j)){
-                reabastecer(i, j);
-                respuesta += "Se reabasteció: "+ matrizMaquina[i][j].getNombre()+ " en casilla "+ matrizMaquina[i][j].getUbicacion()+"\n";
+    public Producto getProductoVendido(String nombre) {
+
+        Producto producto = new Producto(), auxiliar;
+        int cantidadVendido = 0;
+        for (int i = 0; i < arregloVenta.size(); i++) {
+            auxiliar = arregloVenta.get(i).getProductoVenta();
+            if (auxiliar.getNombre().equals(nombre)) {
+                producto = auxiliar;
+                cantidadVendido++;
             }
-            }
+        }
+
+        producto.cantidad = cantidadVendido;
+
+        return producto;
     }
-        
+
+    //Calcula el producto que fue más vendido
+    public String productoMasVendido() {
+
+        String respuesta = "";
+        Producto obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9, obj10;
+        try {
+            obj1 = getProductoVendido("Pony Malta");
+            obj2 = getProductoVendido("CocaCola");
+            obj3 = getProductoVendido("Milo");
+            obj4 = getProductoVendido("Jugo del valle");
+            obj5 = getProductoVendido("Agua");
+            obj6 = getProductoVendido("Café");
+            obj7 = getProductoVendido("Hit");
+            obj8 = getProductoVendido("Colombiana");
+            obj9 = getProductoVendido("Poker");
+            obj10 = getProductoVendido("Sprite");
+
+            if (obj1.getCantidad() == 0 && obj2.getCantidad() == 0 && obj3.getCantidad() == 0
+                    && obj4.getCantidad() == 0 && obj5.getCantidad() == 0 && obj6.getCantidad() == 0
+                    && obj7.getCantidad() == 0 && obj8.getCantidad() == 0 && obj9.getCantidad() == 0
+                    && obj10.getCantidad() == 0) {
+                respuesta = "NO HAY PRODUCTOS VENDIDOS. \n";
+
+            } else {
+                Producto[] productos = new Producto[10];
+                productos[0] = obj1;
+                productos[1] = obj2;
+                productos[2] = obj3;
+                productos[3] = obj4;
+                productos[4] = obj5;
+                productos[5] = obj6;
+                productos[6] = obj7;
+                productos[7] = obj8;
+                productos[8] = obj9;
+                productos[9] = obj10;
+
+                respuesta += "-----------Producto más vendido.\n";
+
+                Arrays.sort(productos);
+                int tamanio = productos.length - 1;
+
+                respuesta += (productos[tamanio].getCantidad() != 0) ? productos[tamanio].getNombre() + ": " + productos[tamanio].getCantidad() + " ventas\n" : "";
+
+            }
+
+        } catch (NullPointerException EXP) {
+            System.out.println("Producto no vendido.");
+        }
+
         return respuesta;
     }
-    
+
+    //Calcula la cantidad de dinero por cada producto
+    public String dineroPorProducto() {
+
+        String respuesta = "";
+        Producto obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8, obj9, obj10;
+        try {
+            obj1 = getProductoVendido("Pony Malta");
+            obj2 = getProductoVendido("CocaCola");
+            obj3 = getProductoVendido("Milo");
+            obj4 = getProductoVendido("Jugo del valle");
+            obj5 = getProductoVendido("Agua");
+            obj6 = getProductoVendido("Café");
+            obj7 = getProductoVendido("Hit");
+            obj8 = getProductoVendido("Colombiana");
+            obj9 = getProductoVendido("Poker");
+            obj10 = getProductoVendido("Sprite");
+
+            if (obj1.getCantidad() == 0 && obj2.getCantidad() == 0 && obj3.getCantidad() == 0
+                    && obj4.getCantidad() == 0 && obj5.getCantidad() == 0 && obj6.getCantidad() == 0
+                    && obj7.getCantidad() == 0 && obj8.getCantidad() == 0 && obj9.getCantidad() == 0
+                    && obj10.getCantidad() == 0) {
+                respuesta = "NO HAY PRODUCTOS VENDIDOS. \n";
+
+            } else {
+                Producto[] productos = new Producto[10];
+                productos[0] = obj1;
+                productos[1] = obj2;
+                productos[2] = obj3;
+                productos[3] = obj4;
+                productos[4] = obj5;
+                productos[5] = obj6;
+                productos[6] = obj7;
+                productos[7] = obj8;
+                productos[8] = obj9;
+                productos[9] = obj10;
+
+                respuesta += "-----------Dinero por producto vendido.\n";
+
+                for (int i = 0; i < 10; i++) {
+
+                    respuesta += (productos[i].getCantidad() != 0) ? productos[i].getNombre() + ": " + productos[i].getCantidad() * productos[i].getPrecio() + "\n" : "";
+                }
+
+            }
+
+        } catch (NullPointerException EXP) {
+            System.out.println("Producto no vendido.");
+        }
+
+        return respuesta;
+    }
+
+    //Setea a 10 la cantidad del producto que hay en una casilla de la matriz, siempre y cuando se halla acabado.
+    public String reabastecerTodo() {
+        String respuesta = "";
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (!validarStockCasilla(i, j)) {
+                    reabastecer(i, j);
+                    respuesta += "Se reabasteció: " + matrizMaquina[i][j].getNombre() + " en casilla " + matrizMaquina[i][j].getUbicacion() + "\n";
+                }
+            }
+        }
+
+        return respuesta;
+    }
+
     //Setea a 10 la cantidad del producto que hay en una casilla de la matriz
-    public void reabastecer(int fila,int columna){
-    Producto unProducto= matrizMaquina[fila][columna];
-    unProducto.cantidad = 10;
-    matrizMaquina[fila][columna]  =   unProducto;
+    public void reabastecer(int fila, int columna) {
+        Producto unProducto = matrizMaquina[fila][columna];
+        unProducto.cantidad = 10;
+        matrizMaquina[fila][columna] = unProducto;
     }
 
     //Comprueba si en la máquina aún queda el mismo producto en otra casilla
@@ -232,7 +323,7 @@ public class Maquina {
             String fecha = String.valueOf(fechaVenta);
             int hora = fechaVenta.getHours(), minuto = fechaVenta.getMinutes();
             Venta nuevaVenta = new Venta(fecha, dineroIngresado, cambio, totalNeto, productoVendido, hora, minuto);
-            System.out.println(totalNeto + " " + dineroIngresado + " " + cambio + " " + fecha + " " + productoVendido.getNombre()+ " " + hora+ " " + minuto);
+            System.out.println(totalNeto + " " + dineroIngresado + " " + cambio + " " + fecha + " " + productoVendido.getNombre() + " " + hora + " " + minuto);
             arregloVenta.add(nuevaVenta);
 
             //calcularCambio(cambio);  
@@ -318,7 +409,8 @@ public class Maquina {
                             //Disminuya la cantidad de esta denominación
                             dinero[7].setCantidad(dinero[7].getCantidad() - 1);
                         }
-                    } if (debeDevolver >= 10000) {
+                    }
+                    if (debeDevolver >= 10000) {
                         Dinero unTipo = dinero[6];
                         if (unTipo.getCantidad() > 0) {
                             unTipo.setCantidad(1);
@@ -328,7 +420,8 @@ public class Maquina {
                             dinero[6].setCantidad(dinero[6].getCantidad() - 1);
                         }
 
-                    } if (debeDevolver >= 5000) {
+                    }
+                    if (debeDevolver >= 5000) {
                         Dinero unTipo = dinero[5];
                         if (unTipo.getCantidad() > 0) {
                             unTipo.setCantidad(1);
@@ -338,7 +431,8 @@ public class Maquina {
                             dinero[5].setCantidad(dinero[5].getCantidad() - 1);
                         }
 
-                    } if (debeDevolver >= 2000) {
+                    }
+                    if (debeDevolver >= 2000) {
                         Dinero unTipo = dinero[4];
                         if (unTipo.getCantidad() > 0) {
                             unTipo.setCantidad(1);
@@ -348,10 +442,11 @@ public class Maquina {
                             dinero[4].setCantidad(dinero[4].getCantidad() - 1);
                         }
 
-                    }  if (debeDevolver >= 1000) {
+                    }
+                    if (debeDevolver >= 1000) {
 
                         Dinero unTipo = dinero[3];
-                         System.out.println(unTipo.getCantidad());
+                        System.out.println(unTipo.getCantidad());
                         if (unTipo.getCantidad() > 0) {
                             System.out.println(unTipo.getCantidad());
                             arregloDineroCambio.add(unTipo);
@@ -360,7 +455,8 @@ public class Maquina {
                             dinero[3].setCantidad(dinero[3].getCantidad() - 1);
                         }
 
-                    } if (debeDevolver >= 500) {
+                    }
+                    if (debeDevolver >= 500) {
 
                         Dinero unTipo = dinero[2];
                         if (unTipo.getCantidad() > 0) {
@@ -371,7 +467,8 @@ public class Maquina {
                             dinero[2].setCantidad(dinero[2].getCantidad() - 1);
                         }
 
-                    } if (debeDevolver >= 200) {
+                    }
+                    if (debeDevolver >= 200) {
 
                         Dinero unTipo = dinero[1];
                         if (unTipo.getCantidad() > 0) {
@@ -382,7 +479,8 @@ public class Maquina {
                             dinero[1].setCantidad(dinero[1].getCantidad() - 1);
                         }
 
-                    } if (debeDevolver >= 100) {
+                    }
+                    if (debeDevolver >= 100) {
 
                         Dinero unTipo = dinero[0];
                         if (unTipo.getCantidad() > 0) {
@@ -400,10 +498,8 @@ public class Maquina {
             }
 
             for (int i = 0; i < arregloDineroCambio.size(); i++) {
-                totalCambio +=  arregloDineroCambio.get(i).getDenominacion();
+                totalCambio += arregloDineroCambio.get(i).getDenominacion();
             }
-
-           
 
             return (totalCambio == debeDevolverFinal);
 

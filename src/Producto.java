@@ -8,7 +8,7 @@
  *
  * @author juanc
  */
-public class Producto {
+public class Producto implements Comparable<Producto>{
     String nombre, urlImagen;
     int precio, ubicacion, cantidad, codigo;
 
@@ -67,7 +67,16 @@ public class Producto {
         this.cantidad = cantidad;
     }
 
-  
+   @Override
+        public int compareTo(Producto o) {
+            if (cantidad < o.cantidad) {
+                return -1;
+            }
+            if (cantidad > o.cantidad) {
+                return 1;
+            }
+            return 0;
+        }  
     
     
 }

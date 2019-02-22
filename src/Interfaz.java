@@ -249,9 +249,9 @@ public class Interfaz extends JFrame{
         
         btAbastecer = new JButton("Reabastecer una casilla");
         btAbastecerTodo = new JButton("Reabastecer vacíos");
-        btDineroProductos = new JButton("Dinero por producto");
+        btDineroProductos = new JButton("Dinero por obtenido producto");
         btVentas = new JButton("Consultar ventas en intervalo de hora");
-        btProducto = new JButton("Producto más vendido");
+        btProducto = new JButton("Consultar producto de mayor venta");
         
         
         pReabastecer = new JPanel(flowSeleccionarProducto);
@@ -686,7 +686,7 @@ public void actionPerformed(ActionEvent e) {
             aResultados.append("La casilla digitada no es válida. \n \n");
             }
         } catch (NumberFormatException exc) {
-            aResultados.append("Dato no válido. \n \n");
+            aResultados.append("Dato no válido.  Campos vacíos o no enteros.\n \n");
         }
     
     }
@@ -705,10 +705,10 @@ public void actionPerformed(ActionEvent e) {
         aResultados.append(unaMaquina.dineroPorProducto());
     }
     if(e.getSource() == btProducto){
-    
+        aResultados.append(unaMaquina.productoMasVendido());
     }
     if(e.getSource() == btVentas){
-    
+      // aResultados.append(unaMaquina.ventasIntervalo());
     }
     
     if(e.getSource() == btEnviarCasilla){
@@ -735,6 +735,7 @@ public void actionPerformed(ActionEvent e) {
                 areaDialogo.append("Producto elegido: "+ nombre+" \n");
                 areaDialogo.append("Precio: "+precio + "\n");
                 btEnviarPago.setEnabled(true);
+                btEnviarCasilla.setText("");
             }else{
                 
             //Si el retorno es -99, la conversión falló.
@@ -745,7 +746,7 @@ public void actionPerformed(ActionEvent e) {
             areaDialogo.append("La casilla digitada no es válida. \n \n");
             }
         } catch (NumberFormatException exc) {
-            areaDialogo.append("Dato no válido. \n \n");
+            areaDialogo.append("Dato no válido. Campos vacíos o no enteros. \n \n");
         }
         
     }
@@ -813,7 +814,7 @@ public void actionPerformed(ActionEvent e) {
                         
                     }
                     catch(NumberFormatException excp){
-                        areaDialogo.append("Dato no válido. \n");
+                        areaDialogo.append("Dato no válido. Campos vacíos o no enteros.\n");
                     } break;
                 case "Billetes":
                     try{
@@ -849,7 +850,7 @@ public void actionPerformed(ActionEvent e) {
                         
                     }
                     catch(NumberFormatException excp){
-                        areaDialogo.append("Dato no válido. \n");
+                        areaDialogo.append("Dato no válido. Campos vacíos o no enteros. \n");
                     }   break;
                 case "Ambos":
                     try{
@@ -901,7 +902,7 @@ public void actionPerformed(ActionEvent e) {
                         
                     }
                     catch(NumberFormatException excp){
-                        areaDialogo.append("Dato no válido. \n");
+                        areaDialogo.append("Dato no válido. Campos vacíos o no enteros. \n");
                     }   break;
                 default:
                     //No ha seleccionado ninguno
@@ -911,7 +912,7 @@ public void actionPerformed(ActionEvent e) {
             
         }catch(NullPointerException excpx){
             
-        areaDialogo.append("No ha realizado selección de medio de pago. \n");
+        areaDialogo.append("No ha realizado selección de medio de pago.  \n");
         }
         
            pintarMatriz();
