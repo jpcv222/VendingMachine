@@ -423,7 +423,7 @@ private void generarDinero(){
             }
             
             //Agregar medio de pago a array interno
-            unaMaquina.agregarDinero(unDinero, i);
+            unaMaquina.agregarMedioPago(unDinero, i);
 
             panelDinero = new JPanel(flowSeleccionarProducto);
 
@@ -619,9 +619,7 @@ private void validarVenta(int total, int precio){
 
                 }
 
-                areaDialogo.append(unaMaquina.vender(productoElegido, fila, columna));
-                unaMaquina.ingresarDinero(dineroIngresado);
-                unaMaquina.agregarVenta(total, cambio, productoElegido);
+                areaDialogo.append(unaMaquina.vender(productoElegido, fila, columna, total, cambio));
                 //areaDialogo.append(unaMaquina.calcularCambio(total-precio));
                 areaDialogo.append(unaMaquina.ruturaStock(productoElegido));
                    
@@ -635,7 +633,7 @@ private void validarVenta(int total, int precio){
       
   
         btEnviarPago.setEnabled(false);
-        
+        jtIngresoCasilla.setText("");
     } else {
         areaDialogo.append("Dinero insuficiente para pagar o dar cambio. \n");
         areaDialogo.append("Se regresa el monto de: $" + total + " \n");
@@ -708,7 +706,12 @@ public void actionPerformed(ActionEvent e) {
         aResultados.append(unaMaquina.productoMasVendido());
     }
     if(e.getSource() == btVentas){
-      // aResultados.append(unaMaquina.ventasIntervalo());
+        
+      String horaInicio, horaFin;
+      horaInicio = jtHoraInicial.getText();
+      horaFin    = jtHoraFinal.getText();
+      
+      aResultados.append(unaMaquina.ventasIntervalo(horaInicio, horaFin));
     }
     
     if(e.getSource() == btEnviarCasilla){

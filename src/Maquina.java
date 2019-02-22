@@ -20,35 +20,86 @@ public class Maquina {
     Dinero[] arregloDineroCaja;
     ArrayList<Dinero> arregloDineroCambio;
     Producto[][] matrizMaquina;
+    int dineroCaja;
 
     //Valida fecha ingresada
     //Retorna true si es válida la fecha
     public boolean validarFecha(String horaInicial, String horaFinal) {
 
-        int _minIn, _minFin, _horaIn, _horaFin;
-        //horaIn representa a los dos primeros digitos en la hora inicial (HORA)
-        //horaFin representa a los dos primeros digitos en la hora final     (HORA)
-        //minIn representa a los dos últimos digitos en la hora inical (MINUTOS)
-        //minFin representa a los dos +ultimos digitos en la hora final    (MINUTOS)
-        String horaIn = horaInicial.split(":")[0];
-        String horaFin = horaFinal.split(":")[0];
-        String minIn = horaInicial.split(":")[1];
-        String minFin = horaFinal.split(":")[1];
+        if (!horaInicial.equals("") && !horaFinal.equals("")) {
+            //Si no están vacíos ambos
+            int _minIn, _minFin, _horaIn, _horaFin;
 
-        try {
+            //horaIn representa a los dos primeros digitos en la hora inicial (HORA)
+            //horaFin representa a los dos primeros digitos en la hora final     (HORA)
+            //minIn representa a los dos últimos digitos en la hora inical (MINUTOS)
+            //minFin representa a los dos +ultimos digitos en la hora final    (MINUTOS)
+            try {
+                String horaIn = horaInicial.split(":")[0];
+                String horaFin = horaFinal.split(":")[0];
+                String minIn = horaInicial.split(":")[1];
+                String minFin = horaFinal.split(":")[1];
 
-            _minIn = Integer.parseInt(minIn);
-            _minFin = Integer.parseInt(minFin);
-            _horaIn = Integer.parseInt(horaIn);
-            _horaFin = Integer.parseInt(horaFin);
+                _minIn = Integer.parseInt(minIn);
+                _minFin = Integer.parseInt(minFin);
+                _horaIn = Integer.parseInt(horaIn);
+                _horaFin = Integer.parseInt(horaFin);
 
-            return (_minIn >= _minFin && _horaIn >= _horaFin);
+                if (_horaIn == _horaFin) {
+                    return _minIn <= _minFin;
+                } else {
+                    return _horaIn < _horaFin;
+                }
 
-        } catch (NumberFormatException exp) {
+            } catch (NumberFormatException | NullPointerException | ArrayIndexOutOfBoundsException exp) {
 
+                return false;
+            }
+
+        } else {
             return false;
         }
 
+    }
+
+    public String ventasIntervalo(String inicio, String fin) {
+        String respuesta = "VENTAS EN INTERVALO INGRESADO \n \n";
+        if (validarFecha(inicio, fin)) {
+        try{
+            int horaIn = Integer.parseInt(inicio.split(":")[0]);
+            int horaFin =Integer.parseInt(fin.split(":")[0]);
+            int minIn =  Integer.parseInt(inicio.split(":")[1]);
+            int minFin = Integer.parseInt(fin.split(":")[1]);
+            //Traer ventas entre las horas
+            int horaVenta, minVenta;
+            for (int i = 0; i < arregloVenta.size(); i++) {
+                horaVenta = arregloVenta.get(i).getHora();
+                minVenta = arregloVenta.get(i).getMinuto();
+                
+                if ((horaVenta > horaIn && horaVenta < horaFin) 
+                        || (horaVenta == horaIn && horaVenta != horaFin && minVenta >= minIn)
+                        || (horaVenta == horaFin && horaVenta != horaFin && minVenta <= minFin)
+                        || (horaVenta == horaFin && horaVenta == horaFin && minVenta >= minIn && minVenta<=minFin)) {
+                    //Si está entre las horas ingresadas
+            
+                respuesta +="Producto: "+arregloVenta.get(i).getProductoVenta().getNombre()+ "Fecha venta: "+ arregloVenta.get(i).getFecha()+ 
+                                " Ingreso: "+arregloVenta.get(i).getDineroIngresado()
+                                + " Cambio: "+ arregloVenta.get(i).getDineroCambio()+ 
+                                    " Total neto: "+ arregloVenta.get(i).getTotalNeto()+ "\n";
+                
+                } else {
+                    respuesta = "NO HAY VENTAS EN ESE INTERVALO.\n";
+            }
+            }
+            
+        }catch(NullPointerException | NumberFormatException | ArrayIndexOutOfBoundsException exp){
+            //Por las buenas prácticas usar try catch
+          respuesta = "ERROR EN INTERVALO DE HORAS \n";
+        }
+        } else {
+            respuesta = "ERROR EN INTERVALO DE HORAS \n";
+        }
+        return respuesta;
     }
 
     //Recorre el arreglo dinámico de ventas y trae un objeto producto que coincida con el parámetro
@@ -223,19 +274,7 @@ public class Maquina {
 
     //Comprueba si el dinero en caja es mayor o igual al que debe devolver
     public int getDineroCaja() {
-        int total1, total2, total3, total4, total5, total6, total7, total8;
-
-        total1 = arregloDineroCaja[0].getCantidad() * arregloDineroCaja[0].getDenominacion();
-        total2 = arregloDineroCaja[1].getCantidad() * arregloDineroCaja[1].getDenominacion();
-        total3 = arregloDineroCaja[2].getCantidad() * arregloDineroCaja[2].getDenominacion();
-        total4 = arregloDineroCaja[3].getCantidad() * arregloDineroCaja[3].getDenominacion();
-        total5 = arregloDineroCaja[4].getCantidad() * arregloDineroCaja[4].getDenominacion();
-        total6 = arregloDineroCaja[5].getCantidad() * arregloDineroCaja[5].getDenominacion();
-        total7 = arregloDineroCaja[6].getCantidad() * arregloDineroCaja[6].getDenominacion();
-        total8 = arregloDineroCaja[7].getCantidad() * arregloDineroCaja[7].getDenominacion();
-
-        return total1 + total2 + total3 + total4 + total5 + total6 + total7 + total8;
-
+        return dineroCaja;
     }
 
     //Convierte número de casilla ingresado por el usuario, a fila correspondiente.
@@ -305,7 +344,7 @@ public class Maquina {
 
     //Agrega un objeto Dinero a una posición del arreglo
     //El arreglo contiene el dinero en caja por cada tipo de opción de pago en la máquina
-    public void agregarDinero(Dinero unDinero, int x) {
+    public void agregarMedioPago(Dinero unDinero, int x) {
         arregloDineroCaja[x] = unDinero;
     }
 
@@ -326,31 +365,20 @@ public class Maquina {
             System.out.println(totalNeto + " " + dineroIngresado + " " + cambio + " " + fecha + " " + productoVendido.getNombre() + " " + hora + " " + minuto);
             arregloVenta.add(nuevaVenta);
 
-            //calcularCambio(cambio);  
         } catch (NullPointerException excp) {
             System.out.println("Fallo en conversión de fecha.");
         }
 
     }
 
-    //Modifica el arreglo interno de la máquina con lo que han pagado los clientes
-    public void ingresarDinero(int[] dineroIngresado) {
-
-        Dinero unDenominacion;
-
-        for (int i = 0; i < 8; i++) {
-
-            unDenominacion = arregloDineroCaja[i];
-            unDenominacion.setCantidad(unDenominacion.getCantidad() + dineroIngresado[i]);
-            arregloDineroCaja[i] = unDenominacion;
-            System.out.println(arregloDineroCaja[i].getCantidad());
-        }
-
+    //Modifica el dinero en caja
+    public void ingresarDinero(int dineroIngresado) {
+        dineroCaja += dineroIngresado;
     }
 
     //Realiza proceso de venta de un producto del stock
     //Retorna un string indicando el resultado de la operación
-    public String vender(Producto productoElegido, int fila, int columna) {
+    public String vender(Producto productoElegido, int fila, int columna, int total, int cambio) {
 
         Producto productoStock = matrizMaquina[fila][columna];
         int cantidadStock;
@@ -362,13 +390,16 @@ public class Maquina {
                 cantidadStock = productoStock.getCantidad();
                 productoStock.setCantidad(cantidadStock - 1);
 
-                retorno = "Producto " + productoElegido.getNombre() + " vendido con éxito \n \n";
+                retorno = "Producto " + productoElegido.getNombre() + " vendido con éxito \n";
+                retorno += "Se regresa cambio de: " + cambio + "\n";
+                ingresarDinero(productoElegido.getPrecio());
+                agregarVenta(total, cambio, productoElegido);
             } else {
-                retorno = "Producto " + productoElegido.getNombre() + " NO vendido con éxito \n \n";
+                retorno = "Producto " + productoElegido.getNombre() + " NO vendido con éxito \n";
 
             }
         } else {
-            retorno = "Producto " + productoElegido.getNombre() + " AGOTADO en la casilla \n \n";
+            retorno = "Producto " + productoElegido.getNombre() + " AGOTADO en la casilla \n";
         }
 
         //Validar que el producto recibido sea el mismo que está en el stock de la máquina en la posición enviada.
@@ -389,231 +420,17 @@ public class Maquina {
     public boolean validarCambio(int debeDevolver) {
         //Copia del arreglo del dinero en caja para posible cambio
         arregloDineroCambio.clear();
-        Dinero[] dinero = arregloDineroCaja;
-        int totalCambio = 0, auxiliar = -1;
-        int debeDevolverFinal = debeDevolver;
+
         int caja = getDineroCaja();
 
         if (caja >= debeDevolver) {
             //Si hay algo en caja, mire si puede devolver
-            while (debeDevolver > 0) {
-                if (auxiliar != debeDevolver) {
-                    auxiliar = debeDevolver;
-                    //Se espera devolver primero al denominación más alta que se pueda
-                    if (debeDevolver >= 20000) {
-                        Dinero unTipo = dinero[7];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 20000;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[7].setCantidad(dinero[7].getCantidad() - 1);
-                        }
-                    }
-                    if (debeDevolver >= 10000) {
-                        Dinero unTipo = dinero[6];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 10000;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[6].setCantidad(dinero[6].getCantidad() - 1);
-                        }
-
-                    }
-                    if (debeDevolver >= 5000) {
-                        Dinero unTipo = dinero[5];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 5000;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[5].setCantidad(dinero[5].getCantidad() - 1);
-                        }
-
-                    }
-                    if (debeDevolver >= 2000) {
-                        Dinero unTipo = dinero[4];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 2000;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[4].setCantidad(dinero[4].getCantidad() - 1);
-                        }
-
-                    }
-                    if (debeDevolver >= 1000) {
-
-                        Dinero unTipo = dinero[3];
-                        System.out.println(unTipo.getCantidad());
-                        if (unTipo.getCantidad() > 0) {
-                            System.out.println(unTipo.getCantidad());
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 1000;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[3].setCantidad(dinero[3].getCantidad() - 1);
-                        }
-
-                    }
-                    if (debeDevolver >= 500) {
-
-                        Dinero unTipo = dinero[2];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 500;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[2].setCantidad(dinero[2].getCantidad() - 1);
-                        }
-
-                    }
-                    if (debeDevolver >= 200) {
-
-                        Dinero unTipo = dinero[1];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 200;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[1].setCantidad(dinero[1].getCantidad() - 1);
-                        }
-
-                    }
-                    if (debeDevolver >= 100) {
-
-                        Dinero unTipo = dinero[0];
-                        if (unTipo.getCantidad() > 0) {
-                            unTipo.setCantidad(1);
-                            arregloDineroCambio.add(unTipo);
-                            debeDevolver = debeDevolver - 100;
-                            //Disminuya la cantidad de esta denominación
-                            dinero[0].setCantidad(dinero[0].getCantidad() - 1);
-                        }
-
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            for (int i = 0; i < arregloDineroCambio.size(); i++) {
-                totalCambio += arregloDineroCambio.get(i).getDenominacion();
-            }
-
-            return (totalCambio == debeDevolverFinal);
-
+            return true;
         } else {
-
             return debeDevolver == 0;
 
         }
 
-    }
-
-    //Calcula si la máquina tiene para devolver cambio
-    //Retorna el cambio generado
-    public String calcularCambio(int debeDevolver) {
-
-        String cambio = "";
-        int totalCambio = debeDevolver;
-        int caja = getDineroCaja();
-
-        if (caja >= debeDevolver) {
-
-            while (debeDevolver > 0) {
-
-                //Se espera devolver primero al denominación más alta que se pueda
-                if (debeDevolver >= 20000) {
-                    Dinero unTipo = arregloDineroCaja[7];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 20000;
-                    }
-                } else if (debeDevolver >= 10000) {
-                    Dinero unTipo = arregloDineroCaja[6];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 10000;
-                    }
-
-                } else if (debeDevolver >= 5000) {
-                    Dinero unTipo = arregloDineroCaja[5];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 5000;
-                    }
-
-                } else if (debeDevolver >= 2000) {
-
-                    Dinero unTipo = arregloDineroCaja[4];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 2000;
-                    }
-
-                } else if (debeDevolver >= 1000) {
-
-                    Dinero unTipo = arregloDineroCaja[3];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 1000;
-                    }
-
-                } else if (debeDevolver >= 500) {
-
-                    Dinero unTipo = arregloDineroCaja[2];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 500;
-                    }
-
-                } else if (debeDevolver >= 200) {
-
-                    Dinero unTipo = arregloDineroCaja[1];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 200;
-                    }
-
-                } else if (debeDevolver >= 100) {
-
-                    Dinero unTipo = arregloDineroCaja[0];
-                    if (unTipo.getCantidad() > 0) {
-                        unTipo.setCantidad(unTipo.getCantidad() - 1);
-                        unTipo.setCantidad(1);
-                        arregloDineroCambio.add(unTipo);
-                        debeDevolver = debeDevolver - 100;
-                    }
-
-                }
-            }
-
-            for (int i = 0; i < arregloDineroCambio.size(); i++) {
-                cambio += "Se devuelven: " + arregloDineroCambio.get(i).getCantidad() + " de " + arregloDineroCambio.get(i).getDenominacion() + "\n";
-            }
-
-        } else if (debeDevolver != 0) {
-            cambio = "No hay cambio suficiente. \n";
-        } else {
-            cambio = "No requiere cambio. \n";
-        }
-
-        return cambio;
     }
 
     public ArrayList<Venta> getArregloVenta() {
@@ -651,6 +468,7 @@ public class Maquina {
         this.arregloDineroCaja = arregloDineroCaja;
         this.arregloVenta = new ArrayList<>();
         this.arregloDineroCambio = new ArrayList<>();
+        this.dineroCaja = 0;
     }
 
 }
